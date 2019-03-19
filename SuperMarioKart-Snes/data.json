@@ -1,0 +1,24 @@
+{
+  "info": {
+    "EastSpeed": {
+      "address": 8261666,
+      "type": "=i2"
+    },
+    "Lap": {
+      "address": 8261825,
+      "type": "=u1"
+    },
+    "OverallSpeed": {
+      "address": 8261866,
+      "type": "=i2"
+    },
+    "SouthSpeed": {
+      "address": 8261668,
+      "type": "=i2"
+    },
+    "Turning": {
+      "address": 8261802,
+      "type": "=i2"
+    }
+  }
+}
