@@ -22,6 +22,14 @@ def save_state(env, state_dir, statename, inttype=retro.data.Integrations.DEFAUL
     with open(file_name, "wb+") as f:
         f.write(gzipped_state)
 
+def load_state(env, statename, inttype=retro.data.Integrations.DEFAULT):
+        if not statename.endswith('.state'):
+                statename += '.state'
+
+        with gzip.open(statename) as fh:
+            env.initial_state = fh.read()
+
+        env.statename = statename
         
 
 def generate_action(index_list):
@@ -38,27 +46,35 @@ straight_action = generate_action([GO])
 def select_best_action(env, statename, num_frames):
     actions = [left_action, right_action, straight_action]
     rewards = [None, None, None]
+    finished = False
     for i in range(0, 3):
-        env.load_state(statename)
+        load_state(env, statename)
         env.reset()
         act = actions[i]
         reward = 0
         for j in range(0, num_frames):
             obs, rew, done, info = env.step(act)
+            finished = done or finished
             time.sleep(.01)
             env.render()
             reward = rew
         rewards[i] = reward
         save_state(env, "states/search_generated", "{}.state".format(i))
 
-    print(rewards)
+    best_index = rewards.index(max(rewards))
 
-    return actions[rewards.index(max(rewards))]
+    return (actions[best_index], "states/search_generated/{}.state".format(best_index), finished)
 
 
 def main():
     env = retro.make(game="SuperMarioKart-Snes")
     obs = env.reset()
+    state = "states/Mario-Circuit-Start.state"
+    done = False
+    while (not done):
+        action, state, done = select_best_action(env, state, 20)
+        print(action)
+
     #oldEnv = copy.deepcopy(env)
     # frame_count = 0
     # while True:
