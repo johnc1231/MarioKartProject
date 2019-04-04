@@ -1,0 +1,1 @@
+This folder is write space for any of the states we write during search problems
