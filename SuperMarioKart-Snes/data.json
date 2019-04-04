@@ -12,6 +12,10 @@
       "address": 8261866,
       "type": "=i2"
     },
+    "POS": {
+      "address": 4288,
+      "type": "<u1"
+    },
     "SouthSpeed": {
       "address": 8261668,
       "type": "=i2"
