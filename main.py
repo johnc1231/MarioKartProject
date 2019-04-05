@@ -42,14 +42,50 @@ left_action = generate_action([GO, LEFT])
 right_action = generate_action([GO, RIGHT])
 straight_action = generate_action([GO])
 
+# def angle_to_action_sequence(angle, max_angle, num_frames):
+#     default = None
+#     if angle < 0:
+#         default = left_action
+#     else: 
+#         default = right_action
+    
+#     # if abs(angle) == max_angle:
+#     #     return [default] * num_frames
+    
+#     result_list = []
+#     # how_often_straight = int(max_angle/(max_angle - abs(angle)))
+#     # return [default if (i % how_often_straight != 0) else straight_action for i in range(0, num_frames)]
+#     for i in range(0, num_frames):
+#         modded_i = i % max_angle
+#         if modded_i < abs(angle):
+#             result_list.append(default)
+#         else:
+#             result_list.append(straight_action)
+
+#     return result_list
+
 def angle_to_action_sequence(angle, max_angle, num_frames):
-    default = None
-    if angle < 0:
-        default = left_action
-    else: 
-        default = right_action
-    how_often_straight = int((max_angle - abs(angle)))
-    return [straight_action if (how_often_straight == 0 or i % how_often_straight == 0) else default for i in range(0, num_frames)]
+    l = left_action
+    r = right_action
+    s = straight_action
+
+    angle_dict = {
+        -10: [l],
+        -9: [l, l, l, l, s],
+        -8: [l, l, l, l, s],
+        -7: [l, l, l, s],
+        -6: [l, l, l, s],
+        -5: [l, s],
+        -4: [s, s, l],
+        -3: [s, s, l],
+        -2: [s, s, s, l],
+        -1: [s, s, s, l],
+        0: [s],
+        1: [s, s, s, r],
+        2: [s, s, s, r],
+        3: [s, s, r],
+        4: []
+    }
         
 
 #maybe dump all of data
@@ -58,7 +94,7 @@ def select_best_action(env, statename, num_frames):
     actions = [left_action, straight_action, right_action]
     rewards = [None] * (max_angle * 2 + 1)
     finished = False
-    for i in range(-max_angle, max_angle):
+    for i in range(-max_angle, max_angle + 1):
         load_state(env, statename)
         env.reset()
         # act = actions[i]
@@ -69,7 +105,7 @@ def select_best_action(env, statename, num_frames):
         # for j in range(0, num_frames):
             obs, rew, done, info = env.step(act)
             finished = done or finished
-            time.sleep(.01)
+            # time.sleep(.01)
             env.render()
             reward = rew
         rewards[i + max_angle] = reward
@@ -77,7 +113,7 @@ def select_best_action(env, statename, num_frames):
 
     print(rewards)
     best_index = rewards.index(max(rewards))
-    best_angle = best_index + max_angle
+    best_angle = best_index - max_angle
     print("GOING {}".format(best_angle))
     time.sleep(1)
 
