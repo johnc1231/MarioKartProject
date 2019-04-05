@@ -44,26 +44,35 @@ straight_action = generate_action([GO])
 
 #maybe dump all of data
 def select_best_action(env, statename, num_frames):
-    actions = [left_action, right_action, straight_action]
-    rewards = [None, None, None]
+    actions = [left_action, straight_action, right_action]
+    num_actions = len(actions)
+    num_iterations = 5
+    total_num = num_iterations * 2 + 1
+    middle_action = total_num / 2
+    rewards = [None] * total_num
     finished = False
-    for i in range(0, 3):
+    for i in range(0, total_num):
         load_state(env, statename)
         env.reset()
-        act = actions[i]
-        reward = 0
+        act = left_action
+        if (i == middle_action):
+            act = straight_action
+        elif i > middle_action:
+            act = right_action
+        mod = i % middle_action + 1
         for j in range(0, num_frames):
-            obs, rew, done, info = env.step(act)
+            act_to_take = act
+            if (j % mod == 0):
+                act_to_take = straight_action
+            obs, rew, done, info = env.step(act_to_take)
             finished = done or finished
-            time.sleep(.01)
-            env.render()
             reward = rew
         rewards[i] = reward
         save_state(env, "states/search_generated", "{}.state".format(i))
 
     best_index = rewards.index(max(rewards))
 
-    return (actions[best_index], "states/search_generated/{}.state".format(best_index), finished)
+    return (best_index, "states/search_generated/{}.state".format(best_index), finished)
 
 
 def main():
@@ -72,7 +81,9 @@ def main():
     state = "states/Mario-Circuit-Start.state"
     done = False
     while (not done):
-        action, state, done = select_best_action(env, state, 20)
+        action, state, done = select_best_action(env, state, 100)
+        load_state(env, state)
+        env.render()
         print(action)
 
     #oldEnv = copy.deepcopy(env)
@@ -92,8 +103,7 @@ def main():
     #     # if done:
     #     #     obs = env.reset()
     # env.close()
-    print(select_best_action(env, "Mario-Circuit-Start.state", 100))
-    env.close()
+    print("FINISHED")
 
 
 if __name__ == "__main__":
