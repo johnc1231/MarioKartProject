@@ -42,28 +42,46 @@ left_action = generate_action([GO, LEFT])
 right_action = generate_action([GO, RIGHT])
 straight_action = generate_action([GO])
 
+def angle_to_action_sequence(angle, max_angle, num_frames):
+    default = None
+    if angle < 0:
+        default = left_action
+    else: 
+        default = right_action
+    how_often_straight = int((max_angle - abs(angle)))
+    return [straight_action if (how_often_straight == 0 or i % how_often_straight == 0) else default for i in range(0, num_frames)]
+        
+
 #maybe dump all of data
 def select_best_action(env, statename, num_frames):
-    actions = [left_action, right_action, straight_action]
-    rewards = [None, None, None]
+    max_angle = 10
+    actions = [left_action, straight_action, right_action]
+    rewards = [None] * (max_angle * 2 + 1)
     finished = False
-    for i in range(0, 3):
+    for i in range(-max_angle, max_angle):
         load_state(env, statename)
         env.reset()
-        act = actions[i]
+        # act = actions[i]
         reward = 0
-        for j in range(0, num_frames):
+        actions = angle_to_action_sequence(i, max_angle, num_frames)
+        print(i)
+        for counter, act in enumerate(actions):
+        # for j in range(0, num_frames):
             obs, rew, done, info = env.step(act)
             finished = done or finished
             time.sleep(.01)
             env.render()
             reward = rew
-        rewards[i] = reward
+        rewards[i + max_angle] = reward
         save_state(env, "states/search_generated", "{}.state".format(i))
 
+    print(rewards)
     best_index = rewards.index(max(rewards))
+    best_angle = best_index + max_angle
+    print("GOING {}".format(best_angle))
+    time.sleep(1)
 
-    return (actions[best_index], "states/search_generated/{}.state".format(best_index), finished)
+    return (actions[best_index], "states/search_generated/{}.state".format(best_angle), finished)
 
 
 def main():
@@ -72,8 +90,8 @@ def main():
     state = "states/Mario-Circuit-Start.state"
     done = False
     while (not done):
-        action, state, done = select_best_action(env, state, 20)
-        print(action)
+        action, state, done = select_best_action(env, state, 200)
+        print("Loading state: {}".format(state))
 
     #oldEnv = copy.deepcopy(env)
     # frame_count = 0
