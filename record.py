@@ -88,7 +88,7 @@ def main():
             img.save(image_path)
             os.chmod(image_path, 0o777)
             action_path = os.path.join(action_folder_path, "frame_{}.csv".format(frame_count))
-            np.savetxt(action_path, action, delimiter=",", fmt="%d")
+            np.savetxt(action_path, [action], delimiter=",", fmt="%d")
         frame_count += 1
     env.close()
 
