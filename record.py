@@ -78,7 +78,7 @@ def main():
         elif (keyboard.is_pressed("q")):
             break
         
-        time.sleep(.01)
+        time.sleep(.03)
  
         obs, rew, done, info = env.step(action)
         env.render()
