@@ -36,7 +36,7 @@ straight_action = generate_action([GO])
 def main():
     env = retro.make(game="SuperMarioKart-Snes")
     obs = env.reset()
-    state = "Mario-Circuit3.state"
+    state = "Mario-Circuit-1-Start.state"
     env.load_state(state)
     env.reset()
     done = False
